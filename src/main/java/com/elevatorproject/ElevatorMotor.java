@@ -3,7 +3,7 @@ package com.elevatorproject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+// TO DO: NEXT & STOP
 public class ElevatorMotor extends Thread{
     public State state;
     public int position;
@@ -13,14 +13,11 @@ public class ElevatorMotor extends Thread{
     { 
         UP, DOWN, NEXT, STOP; 
     } 
-    
-    
+       
     public ElevatorMotor(int floors) {
         this.maxPosition = floors * 10;
     }
-    
-    
-    
+      
     public void goUp(){
         state = State.UP;
     }
