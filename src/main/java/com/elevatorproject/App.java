@@ -1,6 +1,8 @@
 package com.elevatorproject;
 
 import controlCommand.CommandSystem;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -24,6 +26,7 @@ public class App extends Application{
     
     private BorderPane borderPane;
     private Canvas canvas;
+    private final Timer timer = new Timer();
     
     public void goToFloor(int floor){
         drawElevator(floor);
@@ -149,6 +152,23 @@ public class App extends Application{
         stage.setTitle("Ultra Elevator");
         stage.setScene(scene);
         stage.show();
+        
+        //commandSystem = new CommandSystem(); // <- a implémenter
+        elevatorMotor = new ElevatorMotor(floors);
+        
+        timer.scheduleAtFixedRate(new TimerTask(){
+            @Override
+            public void run() {
+                double position = elevatorMotor.position;
+                if(position%10 == 0) System.out.println("[SENSOR] floor:"+position/10); //commandSystem.sensor((int)position);
+                drawElevator(position/10);
+            }
+        }, 1000, 100);
+        
+        Timer timerMotor = new Timer();
+        timerMotor.scheduleAtFixedRate(elevatorMotor, 1000, 1000); // <- c'est une arnaque
+        
+        
     }
     
     public static void main(String[] args) {
