@@ -1,5 +1,7 @@
 package com.elevatorproject;
 
+import com.elevatorproject.ElevatorMotor.State;
+import controlCommand.Basic;
 import controlCommand.CommandSystem;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -153,14 +155,14 @@ public class App extends Application{
         stage.setScene(scene);
         stage.show();
         
-        //commandSystem = new CommandSystem(); // <- a implémenter
         elevatorMotor = new ElevatorMotor(floors);
+        commandSystem = new Basic(elevatorMotor);
         
         timer.scheduleAtFixedRate(new TimerTask(){
             @Override
             public void run() {
                 double position = elevatorMotor.position;
-                if(position%10 == 0) System.out.println("[SENSOR] floor:"+position/10); //commandSystem.sensor((int)position);
+                if(position%10 == 0) commandSystem.sensor((int)position/10);
                 drawElevator(position/10);
             }
         }, 1000, 100);

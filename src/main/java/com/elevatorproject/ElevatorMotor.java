@@ -13,7 +13,9 @@ public class ElevatorMotor extends TimerTask{
     public enum State 
     { 
         UP, DOWN, NEXT, STOP; 
-    } 
+    }
+    
+    private boolean nextLag=true;
        
     public ElevatorMotor(int floors) {
         this.maxPosition = (floors * 10) - 10;
@@ -40,7 +42,7 @@ public class ElevatorMotor extends TimerTask{
     @Override
     public void run(){
         while(true){
-            System.out.println("[MOTOR] s:"+state);
+            System.out.println("[MOTOR] s:"+state+" p:"+position);
             
             try {
                 sleep(150);
@@ -51,10 +53,22 @@ public class ElevatorMotor extends TimerTask{
             switch(state){
                 case UP : if(position != maxPosition) position++; else state = State.STOP; break;
                 case DOWN : if(position != 0) position--; else state = State.STOP; break;
-                case NEXT : if(position%10 == 0) state = State.STOP; else if(wayUp) position++; else position--; break;
+                case NEXT : next(); break;
+                //case NEXT : if(position%10 == 0) state = State.STOP; else if(wayUp) position++; else position--; break;
                 case STOP : break;
             }
             
         }
+    }
+    
+    private void next(){
+        if(nextLag)nextLag = false;
+        else if(position%10 == 0){
+            state = State.STOP;
+            nextLag = true;
+            return;
+        }
+        if(wayUp) position++; 
+        else position--;
     }
 }
