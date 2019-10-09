@@ -12,7 +12,7 @@ public class ElevatorMotor extends TimerTask{
     private boolean wayUp;
     public enum State 
     { 
-        UP, DOWN, NEXT, STOP; 
+        UP, DOWN, NEXT, STOP
     }
     
     private boolean nextLag=true;
