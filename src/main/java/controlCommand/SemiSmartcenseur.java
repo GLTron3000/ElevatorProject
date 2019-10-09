@@ -44,20 +44,20 @@ public class SemiSmartcenseur implements CommandSystem {
     }
 
     @Override
-    public void sensor(int floor) {
+    public void sensor() {
         if(motor.state == ElevatorMotor.State.UP){
-            floor++;
+            current_floor++;
             if(priority_queue.isEmpty()) return;
-            if(floor== priority_queue.get(0)-1){
+            if(current_floor== priority_queue.get(0)-1){
                 System.out.println("[BASIC] stop next UP");
                 priority_queue.remove(0);
                 motor.stopNextFloor();
             }
         }
         else if (motor.state == ElevatorMotor.State.DOWN){
-            floor--;
+            current_floor--;
             if(priority_queue.isEmpty()) return;
-            if(floor == priority_queue.get(0)+1){
+            if(current_floor == priority_queue.get(0)+1){
                 System.out.println("[BASIC] stop next DOWN");
                 priority_queue.remove(0);
                  motor.stopNextFloor();

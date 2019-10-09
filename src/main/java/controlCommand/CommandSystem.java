@@ -9,5 +9,5 @@ public interface CommandSystem {
     
     public void emergencyButton();
     
-    public void sensor(int floor);
+    public void sensor();
 }

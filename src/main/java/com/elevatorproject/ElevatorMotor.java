@@ -1,18 +1,13 @@
 package com.elevatorproject;
 
-import static java.lang.Thread.sleep;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-public class ElevatorMotor extends TimerTask{
+public class ElevatorMotor{
     public State state = State.STOP;
     public int position;
     private final int maxPosition;
-    private boolean wayUp;
+    public boolean wayUp;
     public enum State 
     { 
-        UP, DOWN, NEXT, STOP
+        UP, DOWN, NEXT, STOP; 
     }
     
     private boolean nextLag=true;
@@ -39,25 +34,15 @@ public class ElevatorMotor extends TimerTask{
         state = State.STOP;
     }
 
-    @Override
-    public void run(){
-        while(true){
-            System.out.println("[MOTOR] s:"+state+" p:"+position);
-            
-            try {
-                sleep(150);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ElevatorMotor.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            switch(state){
-                case UP : if(position != maxPosition) position++; else state = State.STOP; break;
-                case DOWN : if(position != 0) position--; else state = State.STOP; break;
-                case NEXT : next(); break;
-                //case NEXT : if(position%10 == 0) state = State.STOP; else if(wayUp) position++; else position--; break;
-                case STOP : break;
-            }
-            
+    public void step(){
+        System.out.println("[MOTOR] s:"+state+" p:"+position);
+
+        switch(state){
+            case UP : if(position != maxPosition) position++; else state = State.STOP; break;
+            case DOWN : if(position != 0) position--; else state = State.STOP; break;
+            case NEXT : next(); break;
+            //case NEXT : if(position%10 == 0) state = State.STOP; else if(wayUp) position++; else position--; break;
+            case STOP : break;
         }
     }
     

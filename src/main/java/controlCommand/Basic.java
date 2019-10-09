@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class Basic implements CommandSystem{
-
     private ElevatorMotor motor;
     private Queue<Integer> queue = new PriorityQueue<>();
     private int floor = 0;
@@ -32,9 +31,9 @@ public class Basic implements CommandSystem{
     }
 
     @Override
-    public void sensor(int floor) {
-        System.out.println("[BASIC] sensor f:"+floor+" queue:"+queue);
-        if(motor.state == State.UP){
+    public void sensor() {
+        System.out.println("[BASIC] sensor f:"+floor+" queue:"+queue+" s:"+motor.state);
+        if(motor.state == State.UP || (motor.state == State.NEXT && motor.wayUp)){
             floor++;
             if(queue.isEmpty()) return;
             if(floor == queue.peek()-1){
@@ -43,7 +42,7 @@ public class Basic implements CommandSystem{
                 motor.stopNextFloor();
             } 
         }
-        else if (motor.state == State.DOWN){
+        else if (motor.state == State.DOWN || (motor.state == State.NEXT && !motor.wayUp)){
             floor--;
             if(queue.isEmpty()) return;
             if(floor == queue.peek()+1){
@@ -53,8 +52,9 @@ public class Basic implements CommandSystem{
             }
         }
         
-        if(floor == this.floor && motor.state == State.STOP) goToNextInQueue();
-        this.floor = floor;
+        if(motor.state == State.STOP) goToNextInQueue();
+        
+        System.out.println("[BASIC 2] sensor f:"+floor);
     }
     
     private void goToNextInQueue(){

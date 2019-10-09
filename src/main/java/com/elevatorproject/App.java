@@ -23,12 +23,12 @@ import javafx.stage.Stage;
 public class App extends Application{
     
     public int floors = 10;
-    public CommandSystem commandSystem;
-    public ElevatorMotor elevatorMotor;
+    public Elevator elevator;
     
     private BorderPane borderPane;
     private Canvas canvas;
     private final Timer timer = new Timer();
+    private int lastFloor=0;
     
     public void goToFloor(int floor){
         drawElevator(floor);
@@ -40,7 +40,7 @@ public class App extends Application{
         button.setStyle("-fx-font: 15 arial; -fx-base: #0c639e;");
         
         button.setOnAction((ActionEvent event) -> {
-            commandSystem.internalButton(floor);
+            elevator.commandSystem.internalButton(floor);
         });
         return button;
     }
@@ -51,7 +51,7 @@ public class App extends Application{
         button.setStyle("-fx-font: 30 arial; -fx-base: #ee2211;");
         
         button.setOnAction((ActionEvent event) -> {
-            commandSystem.emergencyButton();
+            elevator.commandSystem.emergencyButton();
         });
         return button;
     }
@@ -63,11 +63,11 @@ public class App extends Application{
         Label label = new Label("Etage "+floor);
         
         buttonUp.setOnAction((ActionEvent event) -> {
-            commandSystem.externalButton(floor, false);
+            elevator.commandSystem.externalButton(floor, false);
         });
         
         buttonDown.setOnAction((ActionEvent event) -> {
-            commandSystem.externalButton(floor, true);
+            elevator.commandSystem.externalButton(floor, true);
         });
         
         label.setPadding(new Insets(5,10,5,10));
@@ -155,21 +155,19 @@ public class App extends Application{
         stage.setScene(scene);
         stage.show();
         
-        elevatorMotor = new ElevatorMotor(floors);
-        commandSystem = new Basic(elevatorMotor);
+        elevator = new Elevator(floors);
         
         timer.scheduleAtFixedRate(new TimerTask(){
             @Override
             public void run() {
-                double position = elevatorMotor.position;
-                if(position%10 == 0) commandSystem.sensor((int)position/10);
+                double position = elevator.motor.position;
+
                 drawElevator(position/10);
             }
-        }, 1000, 100);
+        }, 1000, 150);
         
         Timer timerMotor = new Timer();
-        timerMotor.scheduleAtFixedRate(elevatorMotor, 1000, 1000); // <- c'est une arnaque
-        
+        timerMotor.scheduleAtFixedRate(elevator, 1000, 500);
         
     }
     
