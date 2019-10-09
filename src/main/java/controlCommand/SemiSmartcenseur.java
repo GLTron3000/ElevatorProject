@@ -60,7 +60,7 @@ public class SemiSmartcenseur implements CommandSystem {
             if(floor == priority_queue.get(0)+1){
                 System.out.println("[BASIC] stop next DOWN");
                 priority_queue.remove(0);
-                motor.stopNextFloor();
+                 motor.stopNextFloor();
 
             }
         }
