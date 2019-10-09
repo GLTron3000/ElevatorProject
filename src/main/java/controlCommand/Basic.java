@@ -2,12 +2,12 @@ package controlCommand;
 
 import com.elevatorproject.ElevatorMotor;
 import com.elevatorproject.ElevatorMotor.State;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class Basic implements CommandSystem{
     private ElevatorMotor motor;
-    private Queue<Integer> queue = new PriorityQueue<>();
+    private Queue<Integer> queue = new LinkedList<>();
     private int floor = 0;
 
     public Basic(ElevatorMotor motor) {
@@ -32,13 +32,12 @@ public class Basic implements CommandSystem{
 
     @Override
     public void sensor() {
-        System.out.println("[BASIC] sensor f:"+floor+" queue:"+queue+" s:"+motor.state);
+        System.out.println("[BASIC A] sensor f:"+floor+" queue:"+queue+" s:"+motor.state);
         if(motor.state == State.UP || (motor.state == State.NEXT && motor.wayUp)){
             floor++;
             if(queue.isEmpty()) return;
             if(floor == queue.peek()-1){
                 System.out.println("[BASIC] stop next UP");
-                queue.poll();
                 motor.stopNextFloor();
             } 
         }
@@ -47,24 +46,36 @@ public class Basic implements CommandSystem{
             if(queue.isEmpty()) return;
             if(floor == queue.peek()+1){
                 System.out.println("[BASIC] stop next DOWN");
-                queue.poll();
                 motor.stopNextFloor();
             }
         }
         
-        if(motor.state == State.STOP) goToNextInQueue();
+        if(motor.state == State.STOP){
+            if(queue.isEmpty()) return;
+            if(floor == queue.peek()) queue.poll();
+            goToNextInQueue();
+        }
         
-        System.out.println("[BASIC 2] sensor f:"+floor);
+        System.out.println("[BASIC B] sensor f:"+floor+" queue:"+queue+" s:"+motor.state);
     }
     
     private void goToNextInQueue(){
         if(queue.isEmpty()) return;
-        if(queue.peek() < floor) motor.goDown();
+        
+        if(floor == queue.peek() -1){
+            motor.goUp();
+            motor.stopNextFloor();
+        }
+        else if(floor == queue.peek() +1){
+            motor.goDown();
+            motor.stopNextFloor();
+        }
+        else if(queue.peek() < floor) motor.goDown();
         else motor.goUp();
     }
     
     private void addCall(int floor){
-        if(floor == this.floor) return;
+        if(floor == this.floor && motor.state == State.STOP) return;
         if(queue.isEmpty()){
             if(this.floor == floor -1){
                 motor.goUp();
@@ -79,4 +90,5 @@ public class Basic implements CommandSystem{
         else queue.add(floor);
         if(motor.state == State.STOP) goToNextInQueue();
     }
+    
 }
