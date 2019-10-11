@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 public class Elevator extends TimerTask{
     public ElevatorMotor motor;
     public CommandSystem commandSystem;
+    public boolean run = true;
     
     public Elevator(int floors){
         motor = new ElevatorMotor(floors);
@@ -19,7 +20,7 @@ public class Elevator extends TimerTask{
     
     @Override
     public void run() {
-        while(true){
+        while(run){
             motor.step();
             sensor();          
             

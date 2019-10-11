@@ -6,7 +6,9 @@ import controlCommand.CommandSystem;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class App extends Application{
     
@@ -152,8 +155,15 @@ public class App extends Application{
         
         var scene = new Scene(borderPane, 640, floors * 70 + 100);
         
+        
+        
         stage.setTitle("Ultra Elevator");
         stage.setScene(scene);
+        stage.setOnCloseRequest(e -> {
+            elevator.run = false;
+            Platform.exit();
+            System.exit(0);
+        });
         stage.show();
         
         elevator = new Elevator(floors);
