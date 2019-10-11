@@ -2,13 +2,15 @@ package com.elevatorproject;
 
 public class ElevatorMotor{
     public State state = State.STOP;
+    public boolean emergency = false;
     public int position;
     private final int maxPosition;
     public boolean wayUp;
     public enum State 
     { 
-        UP, DOWN, NEXT, STOP; 
+        UP, DOWN, NEXT, STOP, EMERGENCY; 
     }
+    
     
     private boolean nextLag=true;
        
@@ -31,7 +33,11 @@ public class ElevatorMotor{
     }
     
     public void emergencyStop(){
-        state = State.STOP;
+        if(emergency){
+            emergency = false;
+            state = State.STOP;
+        }
+        else state = State.EMERGENCY;
     }
 
     public void step(){
@@ -43,6 +49,7 @@ public class ElevatorMotor{
             case NEXT : next(); break;
             //case NEXT : if(position%10 == 0) state = State.STOP; else if(wayUp) position++; else position--; break;
             case STOP : break;
+            case EMERGENCY: emergency = true; break;
         }
     }
     
@@ -53,7 +60,11 @@ public class ElevatorMotor{
             nextLag = true;
             return;
         }
-        if(wayUp) position++; 
-        else position--;
+        if(wayUp){
+            if(position != maxPosition) position++;
+        } 
+        else{
+            if(position != 0) position--;
+        }
     }
 }

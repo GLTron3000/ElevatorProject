@@ -14,6 +14,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -45,8 +46,8 @@ public class App extends Application{
         return button;
     }
     
-    private Button buildEmergencyButton(){
-        Button button = new Button("STOP");
+    private ToggleButton buildEmergencyButton(){
+        ToggleButton button = new ToggleButton("STOP");
         
         button.setStyle("-fx-font: 30 arial; -fx-base: #ee2211;");
         

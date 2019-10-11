@@ -75,6 +75,7 @@ public class Basic implements CommandSystem{
     }
     
     private void addCall(int floor){
+        if(queue.contains(floor)) return;
         if(floor == this.floor && motor.state == State.STOP) return;
         if(queue.isEmpty()){
             if(this.floor == floor -1){
