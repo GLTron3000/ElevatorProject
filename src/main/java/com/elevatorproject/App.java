@@ -3,10 +3,14 @@ package com.elevatorproject;
 import com.elevatorproject.ElevatorMotor.State;
 import controlCommand.Basic;
 import controlCommand.CommandSystem;
+import controlCommand.SemiSmartcenseur;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -15,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
@@ -33,6 +38,11 @@ public class App extends Application{
     private Canvas canvas;
     private final Timer timer = new Timer();
     private int lastFloor=0;
+    
+    private Timer timerElevator = new Timer();
+    enum SystemType{
+        Basic, Smart
+    }
     
     public void goToFloor(int floor){
         drawElevator(floor);
@@ -85,9 +95,42 @@ public class App extends Application{
         canvas = new Canvas(300, floors * 70 + 20);
 
         drawElevator(0);
-        
-        
+ 
         return canvas;
+    }
+    
+    private ChoiceBox commandSystemChooser(){
+        ChoiceBox cbox = new ChoiceBox();
+        
+        cbox.setItems(FXCollections.observableArrayList(SystemType.Basic, SystemType.Smart));
+        
+        cbox.getSelectionModel().selectedIndexProperty().addListener(
+            (ObservableValue<? extends Number> ov, Number oldValue, Number newValue)-> {
+                switch(newValue.intValue()){
+                    case 0: changeSystem(SystemType.Basic); break;
+                    case 1: changeSystem(SystemType.Smart); break;
+                }
+                   
+            }
+        );
+        
+        cbox.setValue(SystemType.Basic);
+        
+        return cbox;
+    }
+    
+    private void changeSystem(SystemType type){
+        if(elevator == null) return;
+        elevator.run = false;
+        
+        elevator = new Elevator(floors);
+        
+        switch(type){
+            case Basic: elevator.commandSystem = new Basic(elevator.motor); break;
+            case Smart: elevator.commandSystem = new SemiSmartcenseur(elevator.motor); break;
+        }
+        
+        timerElevator.scheduleAtFixedRate(elevator, 1000, 500);
     }
     
     private void drawElevator(double floor) {
@@ -129,6 +172,7 @@ public class App extends Application{
         }
         
         vboxInternalButton.getChildren().add(buildEmergencyButton());
+        vboxInternalButton.getChildren().add(commandSystemChooser());
         
         vboxElevator.getChildren().add(buildElevator());
         
@@ -177,8 +221,8 @@ public class App extends Application{
             }
         }, 1000, 150);
         
-        Timer timerMotor = new Timer();
-        timerMotor.scheduleAtFixedRate(elevator, 1000, 500);
+        
+        timerElevator.scheduleAtFixedRate(elevator, 1000, 500);
         
     }
     
