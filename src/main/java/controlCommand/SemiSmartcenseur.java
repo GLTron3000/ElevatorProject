@@ -18,14 +18,12 @@ public class SemiSmartcenseur implements CommandSystem {
 
     @Override
     public void internalButton(int floor) {
-
-        /*if(!waiting_list.contains(floor))
+        if(!waiting_list.contains(floor))
         {
             System.out.println("[SMART] floor added" + " " +floor);
             waiting_list.add(floor);
-        }*/
-        priority_queue.add(floor);
-        verifyList();
+            verifyList();
+        }
         System.out.println("[SMART] internal button pressed");
         goToNextInQueue();
     }
@@ -52,7 +50,6 @@ public class SemiSmartcenseur implements CommandSystem {
 
     @Override
     public void emergencyButton() {
-
         motor.emergencyStop();
         System.out.println("[SMART] emergency stop");
         priority_queue.clear();
@@ -68,6 +65,7 @@ public class SemiSmartcenseur implements CommandSystem {
                 System.out.println("[SMART] stop next UP");
                 priority_queue.remove(0);
                 motor.stopNextFloor();
+                current_floor++;
             }
         }
         else if (motor.state == ElevatorMotor.State.DOWN){
@@ -78,23 +76,24 @@ public class SemiSmartcenseur implements CommandSystem {
                 System.out.println("[SMART] stop next DOWN");
                 priority_queue.remove(0);
                 motor.stopNextFloor();
+                current_floor--;
             }
         }
         if(motor.state == ElevatorMotor.State.STOP){
             if(priority_queue.isEmpty() && waiting_list.isEmpty()) {
                 System.out.println("[SMART] empty + current_floor" + " " + current_floor + " state" + " " + motor.wayUp);
                 affiche_queue();
-                return;
             }
             if(priority_queue.isEmpty() && !waiting_list.isEmpty()) {
-                priority_queue.addAll(waiting_list);
-                waiting_list.clear();
-                System.out.println(" [SMART] list transfered ");
+                System.out.println(" [SMART] direction changed ");
+                verifyList();
                 goToNextInQueue();
             }
-            if(current_floor == priority_queue.get(0))
-                priority_queue.remove(0);
-            goToNextInQueue();
+            if(!priority_queue.isEmpty()){
+                if(current_floor == priority_queue.get(0))
+                    priority_queue.remove(0);
+                goToNextInQueue();
+            }
         }
     }
 
@@ -109,31 +108,30 @@ public class SemiSmartcenseur implements CommandSystem {
             return;
         }
 
-        if(!priority_queue.isEmpty()){
-            if(current_floor < priority_queue.get(0) && !motor.wayUp)
-                motor.goUp();
-            else if(current_floor > priority_queue.get(0) && motor.wayUp)
-                motor.goDown();
-        }
+        if(current_floor < priority_queue.get(0) && !motor.wayUp)
+            motor.goUp();
+        else if(current_floor > priority_queue.get(0) && motor.wayUp)
+            motor.goDown();
+
         if(current_floor == priority_queue.get(0) -1){
             motor.goUp();
             motor.stopNextFloor();
             priority_queue.remove(0);
             current_floor++;
+            System.out.println("[SMART] state : " + motor.state);
         }
         else if(current_floor == priority_queue.get(0) +1){
             motor.goDown();
             motor.stopNextFloor();
             priority_queue.remove(0);
             current_floor--;
+            System.out.println("[SMART] state : " + motor.state);
         }
         else if(priority_queue.get(0) < current_floor) {
             motor.goDown();
-            current_floor--;
         }
         else {
             motor.goUp();
-            current_floor++;
         }
         affiche_queue();
     }
@@ -141,16 +139,23 @@ public class SemiSmartcenseur implements CommandSystem {
     private void verifyList() {
         ArrayList<Integer> tmp = new ArrayList<>(waiting_list);
         for(Integer i : tmp){
+            System.out.println("[SMART] i checked : "+ i );
             if(i > current_floor && (motor.state.equals(ElevatorMotor.State.UP) || motor.state.equals(ElevatorMotor.State.STOP)) && !priority_queue.contains(i) ){
                 priority_queue.add(i);
+                System.out.println("[SMART] i added : "+ i );
                 waiting_list.remove(i);
             }
             Collections.sort(priority_queue);
             if(i < current_floor && (motor.state.equals(ElevatorMotor.State.DOWN) || motor.state.equals(ElevatorMotor.State.STOP)) && !priority_queue.contains(i)){
                 priority_queue.add(i);
+                System.out.println("[SMART] i added : "+ i );
                 waiting_list.remove(i);
                 Collections.sort(priority_queue);
                 Collections.reverse(priority_queue);
+            }
+            if( i == current_floor){
+                priority_queue.remove(i);
+                waiting_list.remove(i);
             }
         }
     }
