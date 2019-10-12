@@ -1,11 +1,17 @@
 package com.elevatorproject;
 
+import static java.lang.Thread.sleep;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class ElevatorMotor{
     public State state = State.STOP;
     public boolean emergency = false;
     public int position;
     private final int maxPosition;
     public boolean wayUp;
+    public boolean isOnFloor = false;
+    
     public enum State 
     { 
         UP, DOWN, NEXT, STOP, EMERGENCY; 
@@ -54,10 +60,11 @@ public class ElevatorMotor{
     }
     
     private void next(){
-        if(nextLag)nextLag = false;
+        if(nextLag) nextLag = false;
         else if(position%10 == 0){
             state = State.STOP;
             nextLag = true;
+            isOnFloor = true;
             return;
         }
         if(wayUp){

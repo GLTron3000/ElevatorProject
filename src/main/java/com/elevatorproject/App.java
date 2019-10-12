@@ -95,7 +95,7 @@ public class App extends Application{
         
         double position = (floors - floor) * 60 - 10;
         
-        gc.clearRect(0, 0, 300, 500);
+        gc.clearRect(0, 0, 300, floors * 70 + 20);
         gc.setFill(Color.DIMGREY);
         gc.fillRect(75, 0, 125, floors * 70 + 20);
         gc.setFill(Color.DARKGRAY);

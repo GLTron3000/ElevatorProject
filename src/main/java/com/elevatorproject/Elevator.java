@@ -2,6 +2,7 @@ package com.elevatorproject;
 
 import controlCommand.Basic;
 import controlCommand.CommandSystem;
+import controlCommand.SemiSmartcenseur;
 import static java.lang.Thread.sleep;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -12,6 +13,7 @@ public class Elevator extends TimerTask{
     public ElevatorMotor motor;
     public CommandSystem commandSystem;
     public boolean run = true;
+    public int floorDelay = 2000;
     
     public Elevator(int floors){
         motor = new ElevatorMotor(floors);
@@ -23,7 +25,7 @@ public class Elevator extends TimerTask{
         while(run){
             motor.step();
             sensor();          
-            
+            floorDelayer();
             try {
                 sleep(100);
             } catch (InterruptedException ex) {
@@ -34,6 +36,18 @@ public class Elevator extends TimerTask{
     
     private void sensor(){
         if(motor.position%10 == 0) commandSystem.sensor();
+    }
+    
+    private void floorDelayer(){
+        if(motor.isOnFloor){
+            try {
+                sleep(floorDelay);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            motor.isOnFloor = false;
+        }        
     }
     
 }
