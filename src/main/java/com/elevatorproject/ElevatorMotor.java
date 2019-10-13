@@ -47,7 +47,7 @@ public class ElevatorMotor{
     }
 
     public void step(){
-        System.out.println("[MOTOR] s:"+state+" p:"+position+" l:"+nextLag);
+        //System.out.println("[MOTOR] s:"+state+" p:"+position+" l:"+nextLag);
 
         switch(state){
             case UP : if(position != maxPosition) position++; else state = State.STOP; break;

@@ -14,10 +14,11 @@ public class Smart implements CommandSystem{
     
     @Override
     public void internalButton(int floor) {
-        if(motor.state == ElevatorMotor.State.DOWN){
+        System.out.println("[SMART] internal f:"+floor);
+        if(isGoingDown()){
             if((floor < this.floor) && (floor > queue.peek())) addCallInBetween(floor, true);
         }
-        else if(motor.state == ElevatorMotor.State.UP){
+        else if(isGoingUp()){
             if((floor > this.floor) && (floor < queue.peek())) addCallInBetween(floor, false);
         }
         else addCall(floor);
@@ -25,11 +26,12 @@ public class Smart implements CommandSystem{
 
     @Override
     public void externalButton(int floor, boolean downward) {
-        if(motor.state == ElevatorMotor.State.DOWN && downward){
-            if((floor < this.floor) && (floor > queue.peek())) addCallInBetween(floor, true);
+        System.out.println("[SMART] external f:"+floor);
+        if(isGoingDown() && downward){
+            if((floor < this.floor)) addCallInBetween(floor, true);
         }
-        else if(motor.state == ElevatorMotor.State.UP && !downward){
-            if((floor > this.floor) && (floor < queue.peek())) addCallInBetween(floor, false);
+        else if(isGoingUp() && !downward){
+            if((floor > this.floor)) addCallInBetween(floor, false);
         }
         else addCall(floor);
     }
@@ -43,7 +45,7 @@ public class Smart implements CommandSystem{
     @Override
     public void sensor() {
         System.out.println("[SMART A] sensor f:"+floor+" queue:"+queue+" s:"+motor.state);
-        if(motor.state == ElevatorMotor.State.UP || (motor.state == ElevatorMotor.State.NEXT && motor.wayUp)){
+        if(isGoingUp()){
             floor++;
             if(queue.isEmpty()) return;
             if(floor == queue.peek()-1){
@@ -51,7 +53,7 @@ public class Smart implements CommandSystem{
                 motor.stopNextFloor();
             } 
         }
-        else if (motor.state == ElevatorMotor.State.DOWN || (motor.state == ElevatorMotor.State.NEXT && !motor.wayUp)){
+        else if (isGoingDown()){
             floor--;
             if(queue.isEmpty()) return;
             if(floor == queue.peek()+1){
@@ -107,6 +109,7 @@ public class Smart implements CommandSystem{
     }
 
     private void addCallInBetween(int floor, boolean downward) {
+        System.out.println("[SMART A] addCallInBetween f:"+floor+" queue:"+queue+" d:"+downward);
         int indexToAdd = 0;
         
         if(downward){
@@ -116,6 +119,14 @@ public class Smart implements CommandSystem{
         }
         
         queue.add(indexToAdd, floor);
+        System.out.println("[SMART B] addCallInBetween f:"+floor+" queue:"+queue+" d:"+downward);
+    }
+ 
+    private boolean isGoingUp(){
+        return motor.state == ElevatorMotor.State.UP || (motor.state == ElevatorMotor.State.NEXT && motor.wayUp);
     }
     
+    private boolean isGoingDown(){
+        return motor.state == ElevatorMotor.State.DOWN || (motor.state == ElevatorMotor.State.NEXT && !motor.wayUp);
+    }
 }
