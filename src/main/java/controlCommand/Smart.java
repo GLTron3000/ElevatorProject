@@ -15,7 +15,6 @@ public class Smart implements CommandSystem{
     @Override
     public void internalButton(int floor) {
         if(queue.contains(floor)) return;
-        System.out.println("[SMART] internal f:"+floor);
         
         if(queue.isEmpty()){
             addCall(floor);
@@ -36,7 +35,7 @@ public class Smart implements CommandSystem{
     @Override
     public void externalButton(int floor, boolean downward) {
         if(queue.contains(floor)) return;
-        System.out.println("[SMART] external f:"+floor+" d:"+downward);
+        
         if(isGoingDown()){
             if(!downward) addAtTail(floor, false);
             else if((floor < this.floor)) addCallInBetween(floor, true);
@@ -121,7 +120,6 @@ public class Smart implements CommandSystem{
     }
 
     private void addCallInBetween(int floor, boolean downward) {
-        System.out.println("[SMART] addCallInBetween f:"+floor);
         int indexToAdd = 0;
         
         if(downward){
@@ -134,7 +132,6 @@ public class Smart implements CommandSystem{
     }
     
     private void addAtTail(int floor, boolean downward) {
-        System.out.println("[SMART] addAtTail f:"+floor+" d:"+downward);
         int indexToAdd = 0;
         
         if(downward){

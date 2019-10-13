@@ -1,19 +1,15 @@
 package com.elevatorproject;
 
-import com.elevatorproject.ElevatorMotor.State;
 import controlCommand.Basic;
-import controlCommand.CommandSystem;
-import controlCommand.SemiSmartcenseur;
+
 import controlCommand.Smart;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -28,7 +24,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class App extends Application{
     
@@ -38,15 +33,49 @@ public class App extends Application{
     private BorderPane borderPane;
     private Canvas canvas;
     private final Timer timer = new Timer();
-    private int lastFloor=0;
     
     private Timer timerElevator = new Timer();
+    
     enum SystemType{
         Basic, Smart
     }
     
-    public void goToFloor(int floor){
-        drawElevator(floor);
+    private void changeSystem(SystemType type){
+        if(elevator == null) return;
+        elevator.run = false;
+        
+        elevator = new Elevator(floors);
+        
+        switch(type){
+            case Basic: elevator.commandSystem = new Basic(elevator.motor); break;
+            case Smart: elevator.commandSystem = new Smart(elevator.motor); break;
+        }
+        
+        timerElevator.scheduleAtFixedRate(elevator, 1000, 500);
+    }
+    
+    private void drawElevator(double floor) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        
+        double position = (floors - floor) * 60 - 10;
+        
+        gc.clearRect(0, 0, 300, floors * 70 + 20);
+        gc.setFill(Color.DIMGREY);
+        gc.fillRect(75, 0, 125, floors * 70 + 20);
+        gc.setFill(Color.DARKGRAY);
+        gc.fillRect(85, position, 105, 40);
+        
+        drawFloorLine();
+    }
+    
+    private void drawFloorLine(){
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        
+        gc.setFill(Color.BLACK);
+        for(int i = 1; i <= floors; i++){
+            gc.fillRect(190, i*60+30, 40, 5);
+            gc.strokeText("N°"+(floors-i), 220, i*60+30);
+        }
     }
     
     private Button buildInternalButton(int floor){
@@ -100,7 +129,7 @@ public class App extends Application{
         return canvas;
     }
     
-    private ChoiceBox commandSystemChooser(){
+    private ChoiceBox buildCommandSystemChooser(){
         ChoiceBox cbox = new ChoiceBox();
         
         cbox.setItems(FXCollections.observableArrayList(SystemType.Basic, SystemType.Smart));
@@ -120,44 +149,6 @@ public class App extends Application{
         return cbox;
     }
     
-    private void changeSystem(SystemType type){
-        if(elevator == null) return;
-        elevator.run = false;
-        
-        elevator = new Elevator(floors);
-        
-        switch(type){
-            case Basic: elevator.commandSystem = new Basic(elevator.motor); break;
-            case Smart: elevator.commandSystem = new Smart(elevator.motor); break;
-        }
-        
-        timerElevator.scheduleAtFixedRate(elevator, 1000, 500);
-    }
-    
-    private void drawElevator(double floor) {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        
-        double position = (floors - floor) * 60 - 10;
-        
-        gc.clearRect(0, 0, 300, floors * 70 + 20);
-        gc.setFill(Color.DIMGREY);
-        gc.fillRect(75, 0, 125, floors * 70 + 20);
-        gc.setFill(Color.DARKGRAY);
-        gc.fillRect(85, position, 105, 40);
-        
-        drawFloorLine();
-    }
-    
-    private void drawFloorLine(){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        
-        gc.setFill(Color.BLACK);
-        for(int i = 1; i <= floors; i++){
-            gc.fillRect(190, i*60+30, 40, 5);
-            gc.strokeText("N°"+(floors-i), 220, i*60+30);
-        }
-    }
-    
     private void initBorderPane(){
         borderPane = new BorderPane();
         
@@ -173,7 +164,7 @@ public class App extends Application{
         }
         
         vboxInternalButton.getChildren().add(buildEmergencyButton());
-        vboxInternalButton.getChildren().add(commandSystemChooser());
+        vboxInternalButton.getChildren().add(buildCommandSystemChooser());
         
         vboxElevator.getChildren().add(buildElevator());
         

@@ -2,7 +2,6 @@ package com.elevatorproject;
 
 import controlCommand.Basic;
 import controlCommand.CommandSystem;
-import controlCommand.SemiSmartcenseur;
 import static java.lang.Thread.sleep;
 import java.util.TimerTask;
 import java.util.logging.Level;

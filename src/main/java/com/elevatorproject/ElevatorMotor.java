@@ -1,9 +1,5 @@
 package com.elevatorproject;
 
-import static java.lang.Thread.sleep;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class ElevatorMotor{
     public State state = State.STOP;
     public boolean emergency = false;
@@ -48,12 +44,13 @@ public class ElevatorMotor{
 
     public void step(){
         //System.out.println("[MOTOR] s:"+state+" p:"+position+" l:"+nextLag);
+        
+        if(emergency) return;
 
         switch(state){
             case UP : if(position != maxPosition) position++; else state = State.STOP; break;
             case DOWN : if(position != 0) position--; else state = State.STOP; break;
             case NEXT : next(); break;
-            //case NEXT : if(position%10 == 0) state = State.STOP; else if(wayUp) position++; else position--; break;
             case STOP : break;
             case EMERGENCY: emergency = true; break;
         }
