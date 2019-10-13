@@ -14,6 +14,7 @@ public class Smart implements CommandSystem{
     
     @Override
     public void internalButton(int floor) {
+        if(queue.contains(floor)) return;
         System.out.println("[SMART] internal f:"+floor);
         
         if(queue.isEmpty()){
@@ -34,6 +35,7 @@ public class Smart implements CommandSystem{
 
     @Override
     public void externalButton(int floor, boolean downward) {
+        if(queue.contains(floor)) return;
         System.out.println("[SMART] external f:"+floor+" d:"+downward);
         if(isGoingDown()){
             if(!downward) addAtTail(floor, false);
