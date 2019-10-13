@@ -26,12 +26,14 @@ public class Smart implements CommandSystem{
 
     @Override
     public void externalButton(int floor, boolean downward) {
-        System.out.println("[SMART] external f:"+floor);
-        if(isGoingDown() && downward){
-            if((floor < this.floor)) addCallInBetween(floor, true);
+        System.out.println("[SMART] external f:"+floor+" d:"+downward);
+        if(isGoingDown()){
+            if(!downward) addAtTail(floor, false);
+            else if((floor < this.floor)) addCallInBetween(floor, true);
         }
-        else if(isGoingUp() && !downward){
-            if((floor > this.floor)) addCallInBetween(floor, false);
+        else if(isGoingUp()){
+            if(downward) addAtTail(floor, true);
+            else if((floor > this.floor)) addCallInBetween(floor, false);
         }
         else addCall(floor);
     }
@@ -109,17 +111,32 @@ public class Smart implements CommandSystem{
     }
 
     private void addCallInBetween(int floor, boolean downward) {
-        System.out.println("[SMART A] addCallInBetween f:"+floor+" queue:"+queue+" d:"+downward);
         int indexToAdd = 0;
         
         if(downward){
-            while(queue.get(indexToAdd) > floor) indexToAdd++;
+            while((queue.size() > indexToAdd) &&queue.get(indexToAdd) > floor) indexToAdd++;
         }else{
-            while(queue.get(indexToAdd) < floor) indexToAdd++;
+            while((queue.size() > indexToAdd) &&queue.get(indexToAdd) < floor) indexToAdd++;
         }
         
         queue.add(indexToAdd, floor);
-        System.out.println("[SMART B] addCallInBetween f:"+floor+" queue:"+queue+" d:"+downward);
+    }
+    
+    private void addAtTail(int floor, boolean downward) {
+        int indexToAdd = 0;
+        
+        if(downward){
+            indexToAdd = indexOfMax();
+            
+            while((queue.size() > indexToAdd) && (queue.get(indexToAdd) > floor)) indexToAdd++;            
+        }else{
+            indexToAdd = indexOfMin();
+
+            while((queue.size() > indexToAdd) && (queue.get(indexToAdd) < floor)) indexToAdd++;
+        }
+        
+        if(indexToAdd >= queue.size()) queue.add(floor);
+        else queue.add(indexToAdd, floor);
     }
  
     private boolean isGoingUp(){
@@ -128,5 +145,23 @@ public class Smart implements CommandSystem{
     
     private boolean isGoingDown(){
         return motor.state == ElevatorMotor.State.DOWN || (motor.state == ElevatorMotor.State.NEXT && !motor.wayUp);
+    }
+    
+    private int indexOfMin(){
+        int indexOfMin = -1;
+        int valueOfMin = 99999;
+
+        for(int i=0; i < queue.size(); i++) if(queue.get(i) < valueOfMin) indexOfMin = i;
+        
+        return indexOfMin;
+    }
+    
+    private int indexOfMax(){
+        int indexOfMax = -1;
+        int valueOfMax = -1;
+
+        for(int i=0; i < queue.size(); i++) if(queue.get(i) > valueOfMax) indexOfMax = i;
+
+        return indexOfMax;
     }
 }
