@@ -4,6 +4,7 @@ import com.elevatorproject.ElevatorMotor.State;
 import controlCommand.Basic;
 import controlCommand.CommandSystem;
 import controlCommand.SemiSmartcenseur;
+import controlCommand.Smart;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Application;
@@ -127,7 +128,7 @@ public class App extends Application{
         
         switch(type){
             case Basic: elevator.commandSystem = new Basic(elevator.motor); break;
-            case Smart: elevator.commandSystem = new SemiSmartcenseur(elevator.motor); break;
+            case Smart: elevator.commandSystem = new Smart(elevator.motor); break;
         }
         
         timerElevator.scheduleAtFixedRate(elevator, 1000, 500);
